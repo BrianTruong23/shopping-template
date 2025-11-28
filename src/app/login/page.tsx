@@ -5,6 +5,8 @@ import { createClient } from '../../lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import styles from './login.module.css'
 
+const STORE_ID = process.env.NEXT_PUBLIC_STORE_ID as string | undefined
+
 export default function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('demo@ofcourt.com')
@@ -20,12 +22,14 @@ export default function LoginPage() {
   const handleGoogleAuth = async () => {
     setLoading(true)
     setError('')
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     })
+
     if (error) {
       setError(error.message)
       setLoading(false)
@@ -36,9 +40,17 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
+    setSuccess('')
+
+    if (!STORE_ID) {
+      setError('Store is not configured. Please set NEXT_PUBLIC_STORE_ID.')
+      setLoading(false)
+      return
+    }
 
     if (mode === 'signin') {
-      const { error } = await supabase.auth.signInWithPassword({
+      // ---- SIGN IN ----
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
@@ -46,36 +58,104 @@ export default function LoginPage() {
       if (error) {
         setError(error.message)
         setLoading(false)
-      } else {
-        setSuccess('Login successful! Redirecting...')
-        // Short delay to show success message before redirect
-        setTimeout(() => {
-          router.push('/')
-          router.refresh()
-        }, 1500)
+        return
       }
+
+      const user = data?.user
+      const userStoreId = user?.user_metadata?.store_id as string | undefined
+
+      if (!userStoreId || userStoreId !== STORE_ID) {
+        await supabase.auth.signOut()
+        setError('This account does not belong to this store.')
+        setLoading(false)
+        return
+      }
+
+      setSuccess('Login successful! Redirecting...')
+      setTimeout(() => {
+        router.push('/')
+        router.refresh()
+      }, 1500)
+      setLoading(false)
     } else {
-      // Sign up
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            store_id: '2a066c2d-5226-4ac1-afa1-fe88a9bd31d2',
+      // --------------------
+      //        SIGN UP
+      // --------------------
+      const { data: signupData, error: signupError } =
+        await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              store_id: STORE_ID,
+            },
           },
-        },
+        })
+
+      if (signupError) {
+        setError(signupError.message)
+        setLoading(false)
+        return
+      }
+
+      // 1) Immediately sign in so we have an authenticated session / JWT
+      const { data: signInData, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+
+      if (signInError) {
+        console.error('Sign-in after signup failed:', signInError)
+        setError(
+          'Account created, but automatic sign-in failed. Please try signing in.'
+        )
+        setLoading(false)
+        return
+      }
+
+      const user = signInData.user
+
+      if (!user) {
+        setError('Sign in succeeded but user data is missing.')
+        setLoading(false)
+        return
+      }
+
+      // 2) Now we are authenticated.
+      // Insert into `service_users`. The database trigger `on_service_user_created`
+      // will automatically create the `clients` or `owners` record based on the role.
+      const { error: serviceUserError } = await supabase.from('service_users').insert({
+        id: user.id,
+        role: 'client',
       })
 
-      if (error) {
-        setError(error.message)
-        setLoading(false)
-      } else {
-        setError('')
-        setSuccess('Account created successfully! Please check your email to confirm your account.')
-        setMode('signin')
-        setLoading(false)
+      if (serviceUserError) {
+        // Ignore duplicate key error (23505) just in case
+        if (serviceUserError.code !== '23505') {
+          console.error('Error creating service_user row:', JSON.stringify(serviceUserError, null, 2))
+          setError(
+            `Account created, but failed to initialize service user: ${serviceUserError.message}`
+          )
+          setLoading(false)
+          return
+        } else {
+           console.log('Service user record already exists. Continuing...')
+        }
       }
+
+      // 3) All good
+      setError('')
+      setSuccess('Account created successfully! Redirecting...')
+      setMode('signin')
+
+      setTimeout(() => {
+        router.push('/')
+        router.refresh()
+      }, 1500)
+
+      setLoading(false)
     }
   }
 
