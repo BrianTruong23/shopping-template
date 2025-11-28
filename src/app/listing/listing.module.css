@@ -1,0 +1,258 @@
+.main {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding-bottom: 80px;
+}
+
+.heroImage {
+  position: relative;
+  height: 50vh;
+  min-height: 400px;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.placeholderOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.4);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(15,23,42,0.9), transparent);
+  z-index: 1;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding-bottom: 60px;
+  color: white;
+}
+
+.backLink {
+  display: inline-block;
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  margin-bottom: 24px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.backLink:hover {
+  color: white;
+}
+
+.heroSeries {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.9;
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.contentWrapper {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 60px;
+  margin-top: -40px;
+  position: relative;
+  z-index: 10;
+}
+
+.mainInfo {
+  background: white;
+  padding: 48px;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  margin: 0 0 24px 0;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.description {
+  margin-bottom: 60px;
+  line-height: 1.8;
+  color: #475569;
+  font-size: 1.1rem;
+}
+
+.specsSection {
+  margin-bottom: 60px;
+}
+
+.specsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  background: #f8fafc;
+  padding: 32px;
+  border-radius: 16px;
+}
+
+.specItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.specLabel {
+  font-size: 0.85rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.specValue {
+  font-size: 1.1rem;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.featureList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+}
+
+.featureItem {
+  background: #f1f5f9;
+  padding: 16px 20px;
+  border-radius: 12px;
+  color: #334155;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+}
+
+.bookingCard {
+  background: white;
+  padding: 32px;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  height: fit-content;
+  position: sticky;
+  top: 40px;
+  border: 1px solid #f1f5f9;
+}
+
+.priceTag {
+  margin-bottom: 24px;
+}
+
+.amount {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.customizationForm {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.select {
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #0f172a;
+  background-color: white;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.bookBtn {
+  width: 100%;
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.bookBtn:hover {
+  background: #334155;
+}
+
+.note {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+  .contentWrapper {
+    grid-template-columns: 1fr;
+    margin-top: 20px;
+  }
+  .heroImage {
+    height: 40vh;
+  }
+  .title {
+    font-size: 2.5rem;
+  }
+  .bookingCard {
+    position: static;
+    order: -1;
+    margin-bottom: 20px;
+  }
+  .mainInfo {
+    padding: 24px;
+  }
+}
